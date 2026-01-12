@@ -68,7 +68,6 @@ A full-stack task management application built with Django REST Framework (backe
 
 - **Frontend**: Open `http://localhost:3000` in your browser
 - **Backend API**: Available at `http://localhost:8000/api/`
-- **Django Admin**: Available at `http://localhost:8000/admin/` (if you created a superuser)
 
 ## API Endpoints
 

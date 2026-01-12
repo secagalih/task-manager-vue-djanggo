@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import User
 from .serializers import UserSerializer
-from django.db.models import Count
 # Create your views here.
 
 class GetUsersView(APIView):

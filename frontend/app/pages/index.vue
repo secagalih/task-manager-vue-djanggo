@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useUsers } from '../../composables/useUsers'
 
-// Navigate to user detail page
+
 const handleRowClick = (event, { item }) => {
   navigateTo(`/user/${item.id}`)
 }

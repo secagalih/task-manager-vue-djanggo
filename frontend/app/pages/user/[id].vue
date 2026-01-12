@@ -1,45 +1,107 @@
 <script setup>
-  import { ref } from 'vue'
-const items = ref([
-  {
-    'id': 1,
-    'task_title': 'Task 1',
-    'description': 'Description 1',
-    'status': 'Pending',
-    'created_at': '2021-01-01',
-  }
-])
-const loading = ref(false)
+import { ref } from 'vue'
+import { useTasks } from '../../../composables/useTasks'
+const userId = useRoute().params.id
 const dialog = ref(false)
+const editDialog = ref(false)
 const headers = [
-  { title: 'Task Title', align: 'start', key: 'task_title' },
+  { title: 'Task Title', align: 'start', key: 'title' },
   { title: 'Description', align: 'start', key: 'description' },
   { title: 'Status', align: 'start', key: 'status' },
   { title: 'Created At', align: 'start', key: 'created_at' },
   { title: 'Action', key: 'action' }
 
 ]
+const dataform = ref({
+  id:null,
+  title: '',
+  description: '',
+  status: 'Pending'
+})
+const { getTasks, addTask, deleteTask, updateTask } = useTasks()
+const { data: tasks, error: tasksError, pending, refresh } = await getTasks(userId)
+
+const handleAddTask = async () => {
+  if (editDialog.value) {
+    const { data, error } = await updateTask({ ...dataform.value, user: userId })
+    if (error) {
+      errorMessage.value = error.message
+    } else {
+      await refresh()
+    }
+    dataform.value = {
+      id: null,
+      title: '',
+      description: '',
+      status: 'Pending'
+    }
+    dialog.value = false
+  } else {
+    const { data, error } = await addTask({ ...dataform.value, user: userId })
+    if (error) {
+      errorMessage.value = error.message
+    } else {
+      await refresh()
+    }
+    dataform.value = {
+      id: null,
+      title: '',
+      description: '',
+      status: 'Pending'
+    }
+    dialog.value = false
+  }
+
+
+}
+
+const handleDeleteTask = async ({ item }) => {
+  if (!confirm(`Are you sure you want to delete "${item.title}"?`)) {
+    return
+  }
+  const { data, error } = await deleteTask(item.id)
+  if (error) {
+    errorMessage.value = error.message
+  } else {
+    await refresh()
+  }
+}
+
+const handleEditTask = async ({ item }) => {
+  editDialog.value = true
+  dialog.value = true
+  dataform.value = {
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    status: item.status
+  }
+}
 
 </script>
 
 <template>
-  <div v-if="loading" class="text-center my-4">
+  <div v-if="pending" class="text-center my-4">
     <v-progress-circular color="primary" indeterminate></v-progress-circular>
   </div>
   <main v-else>
-    <div class="d-flex justify-end my-4">
-      <v-btn>
-        Add Task
-      </v-btn>
-    </div>
+    <v-app-bar :elevation="2">
+      <v-app-bar-title>Tasks</v-app-bar-title>
+      <template v-slot:append>
+        <v-btn color="secondary" @click="dialog = true, dataform = { title: '', description: '', status: 'Pending' }">
+          <v-icon>mdi-plus</v-icon>
+          Add Task
+        </v-btn>
+      </template>
+    </v-app-bar>
 
-    <v-data-table :items="items" density="compact" :headers>
+    <v-data-table :items="tasks" :headers="headers" density="compact" class="mt-4">
       <template v-slot:item.action="{ item }">
         <v-row>
-          <v-btn @click="dialog = true">
+          <v-btn @click="handleEditTask(item)">
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
-          <v-btn>
+          <v-btn @click="handleDeleteTask(item)">
             <v-icon>mdi-trash-can</v-icon>
           </v-btn>
         </v-row>
@@ -52,18 +114,18 @@ const headers = [
         </v-card-title>
 
         <v-card-text>
-          <v-text-field label="Task Title" />
-          <v-textarea label="Description" />
-          <v-select label="Status" :items="['Pending', 'In Progress', 'Completed']" />
+          <v-text-field label="Task Title" v-model="dataform.title" />
+          <v-textarea label="Description" v-model="dataform.description" />
+          <v-select label="Status" :items="['Pending', 'In Progress', 'Completed']" v-model="dataform.status" />
         </v-card-text>
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="secondary">
+          <v-btn color="secondary" @click="dialog = false">
             Cancel
           </v-btn>
-          <v-btn color="primary">
-            Save
+          <v-btn color="primary" @click="handleAddTask">
+            {{ editDialog ? 'Update' : 'Save' }}
           </v-btn>
         </v-card-actions>
       </v-card>

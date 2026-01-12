@@ -1,5 +1,10 @@
-StatusEnum = ['Pending', 'In Progress', 'Completed']
+import { useApi } from "./useApi"
 
+export enum StatusEnum {
+  Pending = 'Pending',
+  InProgress = 'In Progress',
+  Completed = 'Completed',
+}
 
 export interface Task {
   title: string
@@ -17,6 +22,7 @@ export interface AddTaskRequest {
 }
 
 export interface UpdateTaskRequest {
+  id: string
   title: string
   description: string
   status: StatusEnum
@@ -28,8 +34,8 @@ export const useTasks = () => {
   const config = useRuntimeConfig()
   const { apiFetch } = useApi()
 
-  const getTasks = async () => {
-    return useFetch<Task[]>('/tasks/', {
+  const getTasks = async (id: string) => {
+    return useFetch<Task[]>(`/user/${id}`, {
       baseURL: config.public.apiBase,
       method: 'GET',
       key: 'tasks',
@@ -44,7 +50,7 @@ export const useTasks = () => {
         body: request,
       })
       return { data, error: null }
-    } catch (error) {
+    } catch (error: any) {
       return { data: null, error: error.data?.error || 'Failed to add task' }
     }
   }
@@ -56,7 +62,7 @@ export const useTasks = () => {
         body: request,
       })
       return { data, error: null }
-    } catch (error) {
+    } catch (error: any) {
       return { data: null, error: error.data?.error || 'Failed to update task' }
     }
   }
@@ -67,7 +73,7 @@ export const useTasks = () => {
         method: 'POST',
       })
       return { data, error: null }
-    } catch (error) {
+    } catch (error: any) {
       return { data: null, error: error.data?.error || 'Failed to delete task' }
     }
   }

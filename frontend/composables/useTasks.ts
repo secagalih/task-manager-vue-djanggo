@@ -29,7 +29,7 @@ export const useTasks = () => {
   const { apiFetch } = useApi()
 
   const getTasks = async () => {
-    return useFetch<Task[]>('/api/tasks/', {
+    return useFetch<Task[]>('/tasks/', {
       baseURL: config.public.apiBase,
       method: 'GET',
       key: 'tasks',
@@ -39,7 +39,7 @@ export const useTasks = () => {
   const addTask = async (request: AddTaskRequest) => {
     try {
 
-      const data = await apiFetch<Task>('/api/tasks/', {
+      const data = await apiFetch<Task>('/tasks/add/', {
         method: 'POST',
         body: request,
       })
@@ -51,7 +51,7 @@ export const useTasks = () => {
 
   const updateTask = async (request: UpdateTaskRequest) => {
     try {
-      const data = await apiFetch<Task>(`/api/tasks/update/${request.id}/`, {
+      const data = await apiFetch<Task>(`/tasks/update/${request.id}/`, {
         method: 'POST',
         body: request,
       })
@@ -63,7 +63,7 @@ export const useTasks = () => {
 
   const deleteTask = async (id: string) => {
     try {
-      const data = await apiFetch<Task>(`/api/tasks/delete/${id}/`, {
+      const data = await apiFetch<Task>(`/tasks/delete/${id}/`, {
         method: 'POST',
       })
       return { data, error: null }

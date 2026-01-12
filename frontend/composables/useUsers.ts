@@ -10,14 +10,12 @@ export interface AddUserRequest {
   name: string
 }
 
-
-
 export const useUsers = () => {
   const config = useRuntimeConfig()
   const { apiFetch } = useApi()
 
   const getUsers = async () => {
-    return useFetch<User[]>('/api/users/', {
+    return useFetch<User[]>('/users/', {
       baseURL: config.public.apiBase,
       method: 'GET',
       key: 'users',
@@ -27,7 +25,7 @@ export const useUsers = () => {
   const addUser = async (request: AddUserRequest) => {
     try {
       const data = await apiFetch<User>(
-        '/api/users/add/',
+        '/users/add/',
         {
           method: 'POST',
           body: request,

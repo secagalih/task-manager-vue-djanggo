@@ -7,13 +7,17 @@ from .serializers import TaskSerializer
 # Create your views here.
 
 
-class GetTasksView(APIView):
+class GetTasksByUserIdView(APIView):
   #! GET /api/tasks/
-  def get(self, request):
-    tasks = Task.objects.all()
-    serializer = TaskSerializer(tasks, many=True)
-    return Response(serializer.data)
-  
+ def get(self, request, user_id):
+   try:
+     tasks = Task.objects.filter(user=user_id)
+     serializer = TaskSerializer(tasks, many=True)
+     return Response(serializer.data, status=status.HTTP_200_OK)
+   except ValueError:
+     return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+   except Exception as e:
+     return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 class AddTaskView(APIView):
   #! POST /api/tasks/
   def post(self, request):

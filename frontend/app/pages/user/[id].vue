@@ -4,6 +4,7 @@ import { useTasks } from '../../../composables/useTasks'
 const userId = useRoute().params.id
 const dialog = ref(false)
 const editDialog = ref(false)
+const errorMessage = ref('')
 const headers = [
   { title: 'Task Title', align: 'start', key: 'title' },
   { title: 'Description', align: 'start', key: 'description' },
@@ -13,7 +14,7 @@ const headers = [
 
 ]
 const dataform = ref({
-  id:null,
+  id: null,
   title: '',
   description: '',
   status: 'Pending'
@@ -35,6 +36,7 @@ const handleAddTask = async () => {
       description: '',
       status: 'Pending'
     }
+    editDialog.value = false
     dialog.value = false
   } else {
     const { data, error } = await addTask({ ...dataform.value, user: userId })
@@ -49,13 +51,12 @@ const handleAddTask = async () => {
       description: '',
       status: 'Pending'
     }
+    editDialog.value = false
     dialog.value = false
   }
-
-
 }
 
-const handleDeleteTask = async ({ item }) => {
+const handleDeleteTask = async (item) => {
   if (!confirm(`Are you sure you want to delete "${item.title}"?`)) {
     return
   }
@@ -67,7 +68,7 @@ const handleDeleteTask = async ({ item }) => {
   }
 }
 
-const handleEditTask = async ({ item }) => {
+const handleEditTask = (item) => {
   editDialog.value = true
   dialog.value = true
   dataform.value = {
@@ -76,6 +77,18 @@ const handleEditTask = async ({ item }) => {
     description: item.description,
     status: item.status
   }
+}
+
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 </script>
@@ -88,7 +101,7 @@ const handleEditTask = async ({ item }) => {
     <v-app-bar :elevation="2">
       <v-app-bar-title>Tasks</v-app-bar-title>
       <template v-slot:append>
-        <v-btn color="secondary" @click="dialog = true, dataform = { title: '', description: '', status: 'Pending' }">
+        <v-btn color="secondary" @click="editDialog = false; dialog = true; dataform = { id: null, title: '', description: '', status: 'Pending' }">
           <v-icon>mdi-plus</v-icon>
           Add Task
         </v-btn>
@@ -96,6 +109,14 @@ const handleEditTask = async ({ item }) => {
     </v-app-bar>
 
     <v-data-table :items="tasks" :headers="headers" density="compact" class="mt-4">
+      <template v-slot:item.status="{ item }">
+        <v-chip :color="item.status === 'Pending' ? 'primary' : item.status === 'In Progress' ? 'warning' : 'success'" text-color="white">
+          {{ item.status }}
+        </v-chip>
+      </template>
+      <template v-slot:item.created_at="{ item }">
+        {{ formatDate(item.created_at) }}
+      </template>
       <template v-slot:item.action="{ item }">
         <v-row>
           <v-btn @click="handleEditTask(item)">
@@ -110,7 +131,7 @@ const handleEditTask = async ({ item }) => {
     <v-dialog v-model="dialog" max-width="600">
       <v-card>
         <v-card-title>
-          <span class="text-h5">Add New Task</span>
+          <span class="text-h5">{{ editDialog ? 'Edit Task' : 'Add New Task' }}</span>
         </v-card-title>
 
         <v-card-text>
@@ -121,7 +142,8 @@ const handleEditTask = async ({ item }) => {
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="secondary" @click="dialog = false">
+          <v-btn color="secondary"
+            @click="dialog = false; editDialog = false; dataform = { id: null, title: '', description: '', status: 'Pending' }">
             Cancel
           </v-btn>
           <v-btn color="primary" @click="handleAddTask">

@@ -1,34 +1,28 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useUsers } from '../../composables/useUsers'
 
-const items = ref([
-  {
-    'id': 1,
-    "name": "seca",
-    "total_task": 6
-  },
-  {
-    'id': 2,
-    "name": "seca 2",
-    "total_task": 10
-  }
-])
+// Navigate to user detail page
+const handleRowClick = (event, { item }) => {
+  navigateTo(`/user/${item.id}`)
+}
+
+const { getUsers, addUser } = useUsers()
+
+const { data: users, error: usersError, pending, refresh } = await getUsers()
 const loading = ref(false)
 const dialog = ref(false)
+
 
 const headers = [
   { title: 'Client Name', align: 'start', key: 'name' },
   { title: 'Total Task', align: 'start', key: 'total_task' },
 ]
 
-// Navigate to user detail page
-const handleRowClick = (event, { item }) => {
-  navigateTo(`/user/${item.id}`)
-}
 </script>
 
 <template>
-  <div v-if="loading" class="text-center my-4">
+  <div v-if="pending" class="text-center my-4">
     <v-progress-circular color="primary" indeterminate></v-progress-circular>
   </div>
   <main v-else>
@@ -38,14 +32,7 @@ const handleRowClick = (event, { item }) => {
       </v-btn>
     </div>
 
-    <v-data-table 
-      :items="items" 
-      :headers="headers" 
-      density="compact"
-      @click:row="handleRowClick"
-      hover
-      class="cursor-pointer"
-    >
+    <v-data-table :items="users" :headers="headers" density="compact" @click:row="handleRowClick" hover class="cursor-pointer">
     </v-data-table>
     <v-dialog v-model="dialog" max-width="600">
       <v-card>

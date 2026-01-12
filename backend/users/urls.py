@@ -4,5 +4,5 @@ from .views import GetUsersView, AddUserView
 
 urlpatterns = [
     path('', GetUsersView.as_view(), name='users-list'),
-    path('', AddUserView.as_view(), name='add_user'),
+    path('add/', AddUserView.as_view(), name='add_user'),
 ]

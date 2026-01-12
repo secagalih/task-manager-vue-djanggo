@@ -24,21 +24,21 @@ class AddTaskView(APIView):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
   
   
-  class UpdateTaskView(APIView):
+class UpdateTaskView(APIView):
     #! post /api/update/<id>/
-    def post(self, request, id):
-      task = Task.objects.get(id=id)
-      serializer = TaskSerializer(task, data=request.data)
-      if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
-      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+  def post(self, request, id):
+    task = Task.objects.get(id=id)
+    serializer = TaskSerializer(task, data=request.data)
+    if serializer.is_valid():
+      serializer.save()
+      return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
   
-  class DeleteTaskView(APIView):
+class DeleteTaskView(APIView):
     #! delete /api/delete/<id>/
-    def post(self, request, id):
-      task = Task.objects.get(id=id)
-      if task:
-        task.delete()
-        return Response({"message": "Task deleted successfully"}, status=status.HTTP_200_OK)
-      return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
+  def post(self, request, id):
+    task = Task.objects.get(id=id)
+    if task:
+      task.delete()
+      return Response({"message": "Task deleted successfully"}, status=status.HTTP_200_OK)
+    return Response({"message": "Task not found"}, status=status.HTTP_404_NOT_FOUND)

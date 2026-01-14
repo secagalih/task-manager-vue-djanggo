@@ -1,3 +1,4 @@
+import { useFetch } from 'nuxt/app'
 import { useApi } from "./useApi"
 
 export interface User {
@@ -11,14 +12,14 @@ export interface AddUserRequest {
 }
 
 export const useUsers = () => {
-  const config = useRuntimeConfig()
-  const { apiFetch } = useApi()
+  const { apiFetch, apiBase } = useApi()
 
   const getUsers = async () => {
     return useFetch<User[]>('/users/', {
-      baseURL: config.public.apiBase,
+      baseURL: apiBase as string,
       method: 'GET',
       key: 'users',
+      server: false,
     })
   }
 

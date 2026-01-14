@@ -25,7 +25,15 @@ SECRET_KEY = 'django-insecure-%8zx#jb&t(jsy010q8044m^r)%3!5dl%bbnka)f5f9=v=x!bgl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS: Controls which hostnames Django accepts (backend server hostname)
+# Since backend is accessed via localhost:8000 (port mapping), these are the relevant hosts
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0',  # Docker internal
+    'backend',  # Docker service name for inter-container communication
+    # Add your domain here for production: 'yourdomain.com'
+]
 
 
 # Application definition
@@ -84,10 +92,10 @@ DATABASES = {
     }
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",     
-    "http://127.0.0.1:3000",
-]
+# CORS: Controls which origins the browser can make requests from (frontend origin)
+# For development - allow all origins (remove in production)
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

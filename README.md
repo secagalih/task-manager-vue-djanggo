@@ -16,6 +16,10 @@ A full-stack task management application built with Django REST Framework (backe
 
 ## How to Run the Project
 
+### Docker Setup (recommended)
+
+See [`DOCKER.md`](DOCKER.md).
+
 ### Backend Setup
 
 1. Navigate to the backend directory:
@@ -25,7 +29,7 @@ A full-stack task management application built with Django REST Framework (backe
 
 2. Install Python dependencies (if you have a virtual environment, activate it first):
    ```bash
-   pip install django djangorestframework django-cors-headers
+   pip install -r requirements.txt
    ```
 
 3. Run database migrations:

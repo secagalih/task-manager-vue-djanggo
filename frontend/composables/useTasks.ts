@@ -1,3 +1,4 @@
+import { useFetch } from 'nuxt/app'
 import { useApi } from "./useApi"
 
 export enum StatusEnum {
@@ -31,14 +32,14 @@ export interface UpdateTaskRequest {
 
 
 export const useTasks = () => {
-  const config = useRuntimeConfig()
-  const { apiFetch } = useApi()
+  const { apiFetch, apiBase } = useApi()
 
   const getTasks = async (id: string) => {
     return useFetch<Task[]>(`/user/${id}`, {
-      baseURL: config.public.apiBase,
+      baseURL: apiBase as string,
       method: 'GET',
-      key: 'tasks',
+      key: `tasks:${id}`,
+      server: false,
     })
   }
 
